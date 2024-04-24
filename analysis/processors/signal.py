@@ -114,7 +114,7 @@ class SignalProcessor(processor.ProcessorABC):
         # get opposite sign dimuons
         dimuons = dimuons[dimuons["mu1"].charge * dimuons["mu2"].charge < 0]
 
-        # get dimuons with loose and tight mass windows
+        # get dimuons with loose or tight mass windows
         z_mass = (dimuons["mu1"] + dimuons["mu2"]).mass
         loose_mass_window_mask = (
             ((z_mass > 12) & (z_mass < 120))
