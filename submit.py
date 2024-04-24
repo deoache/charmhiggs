@@ -4,6 +4,7 @@ import pickle
 import argparse
 from coffea import processor
 from humanfriendly import format_timespan
+from analysis.processors.signal import SignalProcessor
 from analysis.processors.tag_eff import TaggingEfficiencyProcessor
 from coffea.nanoevents import NanoEventsFactory, PFNanoAODSchema
 
@@ -12,6 +13,7 @@ def main(args):
     # define processors and executors
     processors = {
         "tag_eff": TaggingEfficiencyProcessor,
+        "signal": SignalProcessor,
     }
     processor_args = {
         "tag_eff": {
@@ -19,6 +21,9 @@ def main(args):
             "tagger": args.tagger,
             "flavor": args.flavor,
             "wp": args.wp,
+        },
+        "signal": {
+            "year": args.year,
         }
     }
     executors = {
@@ -32,9 +37,11 @@ def main(args):
     if args.executor == "futures":
         executor_args.update({"workers": 4})
         
-    # run processor
+    # load fileset and execute the processor
     with open(args.fileset) as f:
         fileset = json.load(f)
+    fileset_key = args.fileset.split("/")[-1].replace(".json", "")
+    
     t0 = time.monotonic()
     out = processor.run_uproot_job(
         fileset,
@@ -45,10 +52,17 @@ def main(args):
     )
     exec_time = format_timespan(time.monotonic() - t0)
 
-    print(f"Execution time: {exec_time}")
-    output_name = args.fileset.split("/")[-1].replace(".json", "")
-    with open(f"{args.output_path}/{output_name}.pkl", "wb") as handle:
-        pickle.dump(out, handle, protocol=pickle.HIGHEST_PROTOCOL)
+    # save processor output and metadata
+    metadata = {"walltime": exec_time}
+    metadata.update({"fileset": fileset[fileset_key]})
+    if "metadata" in out[fileset_key]:
+        output_metadata = out[fileset_key]["metadata"]
+        metadata.update({"sumw": float(output_metadata["sumw"])})
+    
+    with open(f"{args.output_path}/{fileset_key}_metadata.json", "w") as f:
+        f.write(json.dumps(metadata))
+    with open(f"{args.output_path}/{fileset_key}.pkl", "wb") as handle:
+        pickle.dump(out[fileset_key]["histograms"], handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == "__main__":
@@ -58,14 +72,14 @@ if __name__ == "__main__":
         dest="processor",
         type=str,
         default="tag_eff",
-        help="processor to be used {tag_eff}",
+        help="processor to be used {tag_eff, signal}",
     )
     parser.add_argument(
         "--executor",
         dest="executor",
         type=str,
-        default="iterative",
-        help="executor",
+        default="futures",
+        help="executor to run the processor {iterative, futures}",
     )
     parser.add_argument(
         "--fileset",
@@ -79,7 +93,7 @@ if __name__ == "__main__":
         dest="year",
         type=str,
         default="2022EE",
-        help="year of the data {2022EE, 2022, 2023}",
+        help="year of the data {2022EE}",
     )
     parser.add_argument(
         "--output_path",
