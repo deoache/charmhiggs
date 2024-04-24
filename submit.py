@@ -3,10 +3,8 @@ import time
 import pickle
 import argparse
 from coffea import processor
+from humanfriendly import format_timespan
 from analysis.processors.tag_eff import TaggingEfficiencyProcessor
-
-# from analysis.processors.signal import SignalProcessor
-
 from coffea.nanoevents import NanoEventsFactory, PFNanoAODSchema
 
 
@@ -34,7 +32,6 @@ def main(args):
     if args.executor == "futures":
         executor_args.update({"workers": 4})
         
-    
     # run processor
     with open(args.fileset) as f:
         fileset = json.load(f)
@@ -87,7 +84,7 @@ if __name__ == "__main__":
         "--year",
         dest="year",
         type=str,
-        default="",
+        default="2022EE",
         help="year of the data {2022EE, 2022, 2023}",
     )
     parser.add_argument(
@@ -115,7 +112,7 @@ if __name__ == "__main__":
         "--flavor",
         dest="flavor",
         type=str,
-        default="",
+        default="c",
         help="Hadron flavor {c, b}",
     )
     parser.add_argument(
