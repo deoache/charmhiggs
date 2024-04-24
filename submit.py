@@ -46,7 +46,8 @@ def main(args):
     exec_time = format_timespan(time.monotonic() - t0)
 
     print(f"Execution time: {exec_time}")
-    with open(f"{args.output_path}/{args.sample}.pkl", "wb") as handle:
+    output_name = args.fileset.split("/")[-1].replace(".json", "")
+    with open(f"{args.output_path}/{output_name}.pkl", "wb") as handle:
         pickle.dump(out, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 
@@ -65,13 +66,6 @@ if __name__ == "__main__":
         type=str,
         default="iterative",
         help="executor",
-    )
-    parser.add_argument(
-        "--sample",
-        dest="sample",
-        type=str,
-        default="",
-        help="sample to be processed",
     )
     parser.add_argument(
         "--fileset",
