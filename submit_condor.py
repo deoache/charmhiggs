@@ -34,6 +34,9 @@ def main(args):
             f"--nfiles {args['nfiles']} "
             f"--executor {args['executor']} "
             f"--fileset {args['fileset']} "
+            f"--tagger {args['tagger']} "
+            f"--flavor {args['flavor']} "
+            f"--wp {args['wp']} "
         )
         submit_condor(args)
 
