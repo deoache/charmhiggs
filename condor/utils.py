@@ -17,7 +17,7 @@ def move_X509() -> str:
         )
     except Exception as err:
         raise RuntimeError(
-            "x509 proxy could not be parsed, try creating it with 'voms-proxy-init --voms cms'"
+            "x509 proxy could not be parsed, try creating it condowith 'voms-proxy-init --voms cms'"
         ) from err
     x509_path = f"{Path.home()}/private/{x509_localpath.split('/')[-1]}"
     subprocess.run(["cp", x509_localpath, x509_path])
@@ -27,20 +27,23 @@ def move_X509() -> str:
 def submit_condor(args: dict) -> None:
     """build condor and executable files. Submit condor job"""
     main_dir = Path.cwd()
-    condor_dir = Path(f"{main_dir}/condor")
+    condor_dir = Path(main_dir / "condor")
+    
+    jobpath = f"{args['processor']}/{args['year']}"
+    if args["processor"] == "tag_eff":
+        jobpath = f'{jobpath}/{args["tagger"]}/{args["flavor"]}/{args["wp"]}'
+        
+    # create logs directory
+    log_dir = Path(condor_dir / "logs" / jobpath)
+    if not log_dir.exists():
+        log_dir.mkdir(parents=True)
     
     # set jobname
     jobname = f'{args["processor"]}_'
     jobname += args["fileset"].split("/")[-1].replace(".json", "")
-
-    # create logs directory
-    log_dir = f"{str(condor_dir)}/logs/{args['processor']}/{args['year']}"
-    log_dir = Path(log_dir)
-    if not log_dir.exists():
-        log_dir.mkdir(parents=True)
         
     # creal local condor submit file
-    local_condor_path = Path(str(log_dir).replace("logs/", ""))
+    local_condor_path = Path(condor_dir / jobpath)
     if not local_condor_path.exists():
         local_condor_path.mkdir(parents=True)
     local_condor = f"{local_condor_path}/{jobname}.sub"
@@ -51,15 +54,14 @@ def submit_condor(args: dict) -> None:
     for line in condor_template_file:
         line = line.replace("DIRECTORY", str(condor_dir))
         line = line.replace("JOBNAME", jobname)
-        line = line.replace("YEAR", args["year"])
+        line = line.replace("JOBPATH", jobpath)
         line = line.replace("JOBFLAVOR", f'"longlunch"')
-        line = line.replace("PROCESSOR", args["processor"])
         condor_file.write(line)
     condor_file.close()
     condor_template_file.close()
 
     # make executable file
-    x509_path = move_X509() 
+    x509_path = "X"#move_X509() 
     sh_template_file = open(f"{condor_dir}/submit.sh")
     local_sh = f"{local_condor_path}/{jobname}.sh"
     sh_file = open(local_sh, "w")
@@ -73,4 +75,4 @@ def submit_condor(args: dict) -> None:
 
     # submit jobs
     print(f"submitting {jobname}")
-    subprocess.run(["condor_submit", local_condor])
+    #subprocess.run(["condor_submit", local_condor])
