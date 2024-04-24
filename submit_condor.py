@@ -82,5 +82,26 @@ if __name__ == "__main__":
         default=-1,
         help="number of .root files to be processed by sample. To run all files use -1 (default 1)",
     )
+    parser.add_argument(
+        "--tagger",
+        dest="tagger",
+        type=str,
+        default="pnet",
+        help="tagger {pnet, part, deepjet}",
+    )
+    parser.add_argument(
+        "--wp",
+        dest="wp",
+        type=str,
+        default="tight",
+        help="working point {loose, medium, tight}",
+    )
+    parser.add_argument(
+        "--flavor",
+        dest="flavor",
+        type=str,
+        default="c",
+        help="Hadron flavor {c, b}",
+    )
     args = parser.parse_args()
     main(args)

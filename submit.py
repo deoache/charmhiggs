@@ -115,7 +115,7 @@ if __name__ == "__main__":
         "--flavor",
         dest="flavor",
         type=str,
-        default="c",
+        default="",
         help="Hadron flavor {c, b}",
     )
     parser.add_argument(
