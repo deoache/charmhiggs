@@ -18,6 +18,8 @@ def main(args):
     )    
     
     output_path = Path(Path.cwd() / "outputs" / args["processor"] / args["year"])
+    if args["processor"] == "tag_eff":
+        output_path = Path(output_path / args["tagger"] / args["flavor"] / args["wp"])
     if not output_path.exists():
         output_path.mkdir(parents=True)
     args["output_path"] = str(output_path)
