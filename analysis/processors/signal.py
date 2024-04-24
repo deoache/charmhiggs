@@ -145,7 +145,7 @@ class SignalProcessor(processor.ProcessorABC):
         # -----------------------------
         # impose some quality and minimum pt cuts on jets
         jets = events.Jet
-        jets = jets[(jets.pt >= 30) & (np.abs(jets.eta) < 2.4) & (jets.jetId == 6)]
+        jets = jets[(jets.pt >= 30) & (np.abs(jets.eta) < 2.5) & (jets.jetId == 6)]
         jets = jets[ak.all(jets.metric_table(muons) > 0.4, axis=-1)]
         # get cjets using deepjet, particlenet and partRobust taggers
         tagger_jets = {
