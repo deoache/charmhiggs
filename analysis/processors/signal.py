@@ -110,18 +110,18 @@ class SignalProcessor(processor.ProcessorABC):
         mu1, mu2 = dimuons["mu1"], dimuons["mu2"]
         dr_mask = mu1.delta_r(mu2) > 0.02
         dimuons = dimuons[dr_mask]
+        
+        # get opposite sign dimuons
+        dimuons = dimuons[dimuons["mu1"].charge * dimuons["mu2"].charge < 0]
 
         # get dimuons with loose and tight mass windows
         z_mass = (dimuons["mu1"] + dimuons["mu2"]).mass
         loose_mass_window_mask = (
-            (dimuons["mu1"].charge * dimuons["mu2"].charge < 0)
-            & ((z_mass > 12) & (z_mass < 120))
+            ((z_mass > 12) & (z_mass < 120))
             & dimuons["mu1"].tightId
             & dimuons["mu2"].tightId
         )
-        tight_mass_window_mask = (dimuons["mu1"].charge * dimuons["mu2"].charge < 0) & (
-            (z_mass > 80) & (z_mass < 100)
-        )
+        tight_mass_window_mask = (z_mass > 80) & (z_mass < 100)
         dimuons = dimuons[loose_mass_window_mask | tight_mass_window_mask]
 
         # compute |mass(mu1, mu2) - mass(Z)|
