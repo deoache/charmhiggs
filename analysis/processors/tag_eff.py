@@ -80,7 +80,7 @@ class TaggingEfficiencyProcessor(processor.ProcessorABC):
             dataset=dataset,
             pt=ak.flatten(jets.pt),
             eta=ak.flatten(jets.eta),
-            flavor=ak.flatten(jets.hadronFlavour),
+            flavor=ak.values_astype(ak.flatten(jets.hadronFlavour), "int32"),
             pass_wp=ak.flatten(pass_wp),
         )
 
