@@ -165,32 +165,32 @@ class SignalProcessor(processor.ProcessorABC):
         selections.add("leadingmuonpt", ak.firsts(muons).pt > 20)
         selections.add("subleadingmuonpt", ak.firsts(muons[:, 1:]).pt > 10)
         selections.add("atleast4muons", ak.num(muons) >= 4)
-        selections.add("atleast2candidates", ak.num(dimuons) >= 2)
-        selections.add("onedeepjet", ak.num(tagger_jets["deepjet"]) == 1)
-        selections.add("onepnetjet", ak.num(tagger_jets["pnet"]) == 1)
-        selections.add("onepartjet", ak.num(tagger_jets["part"]) == 1)
+        selections.add("atleast2zcandidates", ak.num(dimuons) >= 2)
+        selections.add("exactlyonedeepjet", ak.num(tagger_jets["deepjet"]) == 1)
+        selections.add("exactlyonepnetjet", ak.num(tagger_jets["pnet"]) == 1)
+        selections.add("exactlyonepartjet", ak.num(tagger_jets["part"]) == 1)
 
         regions = {
             "deepjet": [
                 "leadingmuonpt",
                 "subleadingmuonpt",
                 "atleast4muons",
-                "atleast2candidates",
-                "onedeepjet",
+                "atleast2zcandidates",
+                "exactlyonedeepjet",
             ],
             "pnet": [
                 "leadingmuonpt",
                 "subleadingmuonpt",
                 "atleast4muons",
-                "atleast2candidates",
-                "onepnetjet",
+                "atleast2zcandidates",
+                "exactlyonepnetjet",
             ],
             "part": [
                 "leadingmuonpt",
                 "subleadingmuonpt",
                 "atleast4muons",
-                "atleast2candidates",
-                "onepartjet",
+                "atleast2zcandidates",
+                "exactlyonepartjet",
             ],
         }
         # -----------------------------
